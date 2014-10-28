@@ -1,7 +1,6 @@
 package de.tuberlin.dima.minidb.io.cache;
 
 
-import de.tuberlin.dima.minidb.io.PageExpiredException;
 
 
 /**

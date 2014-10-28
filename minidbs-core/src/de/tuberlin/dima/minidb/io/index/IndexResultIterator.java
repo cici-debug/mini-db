@@ -2,7 +2,7 @@ package de.tuberlin.dima.minidb.io.index;
 
 import java.io.IOException;
 
-import de.tuberlin.dima.minidb.io.PageFormatException;
+import de.tuberlin.dima.minidb.io.cache.PageFormatException;
 
 
 /**

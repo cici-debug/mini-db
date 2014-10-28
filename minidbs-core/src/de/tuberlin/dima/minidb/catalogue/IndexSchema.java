@@ -4,7 +4,7 @@ package de.tuberlin.dima.minidb.catalogue;
 import java.io.IOException;
 
 import de.tuberlin.dima.minidb.core.RID;
-import de.tuberlin.dima.minidb.io.PageSize;
+import de.tuberlin.dima.minidb.io.cache.PageSize;
 import de.tuberlin.dima.minidb.io.index.BTreeIndexPage;
 import de.tuberlin.dima.minidb.io.index.IndexResourceManager;
 

@@ -1,4 +1,4 @@
-package de.tuberlin.dima.minidb.io;
+package de.tuberlin.dima.minidb.io.manager;
 
 
 /**

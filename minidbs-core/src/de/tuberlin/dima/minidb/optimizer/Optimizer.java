@@ -17,7 +17,7 @@ import de.tuberlin.dima.minidb.catalogue.IndexDescriptor;
 import de.tuberlin.dima.minidb.catalogue.TableDescriptor;
 import de.tuberlin.dima.minidb.core.DataType;
 import de.tuberlin.dima.minidb.core.InternalOperationFailure;
-import de.tuberlin.dima.minidb.io.PageSize;
+import de.tuberlin.dima.minidb.io.cache.PageSize;
 import de.tuberlin.dima.minidb.io.tables.TablePage;
 import de.tuberlin.dima.minidb.optimizer.cardinality.CardinalityEstimator;
 import de.tuberlin.dima.minidb.optimizer.cost.CostEstimator;

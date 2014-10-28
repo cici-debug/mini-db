@@ -8,7 +8,7 @@ import de.tuberlin.dima.minidb.catalogue.ColumnSchema;
 import de.tuberlin.dima.minidb.catalogue.TableDescriptor;
 import de.tuberlin.dima.minidb.catalogue.TableSchema;
 import de.tuberlin.dima.minidb.core.IllegalOperationException;
-import de.tuberlin.dima.minidb.io.BufferPoolManager;
+import de.tuberlin.dima.minidb.io.manager.BufferPoolManager;
 import de.tuberlin.dima.minidb.optimizer.OrderedColumn;
 import de.tuberlin.dima.minidb.qexec.PhysicalPlanOperator;
 import de.tuberlin.dima.minidb.qexec.heap.QueryHeap;

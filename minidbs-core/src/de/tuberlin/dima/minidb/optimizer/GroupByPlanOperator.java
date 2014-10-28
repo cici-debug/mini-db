@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.tuberlin.dima.minidb.core.DataType;
-import de.tuberlin.dima.minidb.io.BufferPoolManager;
+import de.tuberlin.dima.minidb.io.manager.BufferPoolManager;
 import de.tuberlin.dima.minidb.parser.OutputColumn;
 import de.tuberlin.dima.minidb.qexec.OperatorFactory;
 import de.tuberlin.dima.minidb.qexec.PhysicalPlanOperator;

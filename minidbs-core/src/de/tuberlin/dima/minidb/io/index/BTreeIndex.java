@@ -7,7 +7,7 @@ import de.tuberlin.dima.minidb.catalogue.IndexSchema;
 import de.tuberlin.dima.minidb.core.DataField;
 import de.tuberlin.dima.minidb.core.DuplicateException;
 import de.tuberlin.dima.minidb.core.RID;
-import de.tuberlin.dima.minidb.io.PageFormatException;
+import de.tuberlin.dima.minidb.io.cache.PageFormatException;
 
 
 /**

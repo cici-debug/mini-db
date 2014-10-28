@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.tuberlin.dima.minidb.Constants;
-import de.tuberlin.dima.minidb.io.PageSize;
-import de.tuberlin.dima.minidb.io.UnsupportedPageSizeException;
+import de.tuberlin.dima.minidb.io.cache.PageSize;
+import de.tuberlin.dima.minidb.io.cache.UnsupportedPageSizeException;
 import de.tuberlin.dima.minidb.util.Pair;
 
 

@@ -9,11 +9,11 @@ import de.tuberlin.dima.minidb.catalogue.IndexSchema;
 import de.tuberlin.dima.minidb.catalogue.TableSchema;
 import de.tuberlin.dima.minidb.core.DataField;
 import de.tuberlin.dima.minidb.core.DataType;
-import de.tuberlin.dima.minidb.io.BufferPoolManager;
-import de.tuberlin.dima.minidb.io.PageFormatException;
-import de.tuberlin.dima.minidb.io.PageSize;
 import de.tuberlin.dima.minidb.io.cache.PageCache;
+import de.tuberlin.dima.minidb.io.cache.PageFormatException;
+import de.tuberlin.dima.minidb.io.cache.PageSize;
 import de.tuberlin.dima.minidb.io.index.BTreeIndex;
+import de.tuberlin.dima.minidb.io.manager.BufferPoolManager;
 import de.tuberlin.dima.minidb.io.tables.TablePage;
 import de.tuberlin.dima.minidb.io.tables.TableResourceManager;
 import de.tuberlin.dima.minidb.optimizer.cardinality.CardinalityEstimator;
@@ -22,7 +22,6 @@ import de.tuberlin.dima.minidb.optimizer.generator.PhysicalPlanGenerator;
 import de.tuberlin.dima.minidb.optimizer.joins.JoinOrderOptimizer;
 import de.tuberlin.dima.minidb.parser.OutputColumn;
 import de.tuberlin.dima.minidb.parser.SQLParser;
-import de.tuberlin.dima.minidb.parser.solution.SQLParserImpl;
 import de.tuberlin.dima.minidb.qexec.DeleteOperator;
 import de.tuberlin.dima.minidb.qexec.FetchOperator;
 import de.tuberlin.dima.minidb.qexec.FilterCorrelatedOperator;
@@ -42,7 +41,6 @@ import de.tuberlin.dima.minidb.qexec.heap.QueryHeap;
 import de.tuberlin.dima.minidb.qexec.predicate.JoinPredicate;
 import de.tuberlin.dima.minidb.qexec.predicate.LocalPredicate;
 import de.tuberlin.dima.minidb.semantics.SelectQueryAnalyzer;
-import de.tuberlin.dima.minidb.semantics.solution.SelectQueryAnalyzerImpl;
 
 
 /**
@@ -71,53 +69,12 @@ public abstract class AbstractExtensionFactory
 	 * @throws IllegalStateException If <code>init</code> has not been called on
 	 *                               the <code>ExtansionFactory</code>.
 	 */
-	public static AbstractExtensionFactory getExtensionFactory() throws IllegalStateException
+	public static final AbstractExtensionFactory getExtensionFactory() throws IllegalStateException
 	{
 		if (singletonInstance == null) {
 			throw new IllegalStateException("Factory has not been initialized!");
 		} else {
 			return singletonInstance;
-		}
-	}
-	
-	
-	// ------------------------------------------------------------------------
-	//                           Initialization
-	// ------------------------------------------------------------------------
-	
-	/**
-	 * Initializes this <code>ExtensionFactory</code> with the class name of the
-	 * actual implementation.
-	 * 
-	 * @param implementationClass The name of the class that holds the actual
-	 *         implementation.
-	 * @throws ExtensionInitFailedException If the class could for some reason not be
-	 *          initialized. The Exception contains further information.
-	 */
-	public static void initFromClassName(String implementationClass) throws ExtensionInitFailedException
-	{
-		try
-		{
-			Class<? extends AbstractExtensionFactory> ec = Class.forName(implementationClass).asSubclass(AbstractExtensionFactory.class);
-			singletonInstance = ec.newInstance();
-		}
-		catch (ClassNotFoundException cnfex) {
-			throw new ExtensionInitFailedException("The class '" + implementationClass +
-					"' was not found. Check that it is in the class path.", cnfex);
-		}
-		catch (ExceptionInInitializerError eiiex) {
-			throw new ExtensionInitFailedException("The class '" + implementationClass +
-					"' could not be loaded, because errors occurred in the initializers.",
-					eiiex);
-		}
-		catch (ClassCastException ccex) {
-			throw new ExtensionInitFailedException("The class '" + implementationClass +
-					"' is not a subclass of '" + AbstractExtensionFactory.class.getName() +
-					"'.", ccex);
-		}
-		catch (Throwable t) {
-			throw new ExtensionInitFailedException("The class '" + implementationClass +
-					"' could not be loaded due to an unknown error." + t.getMessage(), t);
 		}
 	}
 	
@@ -127,13 +84,12 @@ public abstract class AbstractExtensionFactory
 	 * @throws ExtensionInitFailedException Thrown, if the default resource could not be located,
 	 *                                      or the property was undefined.
 	 */
-	public static void initializeDefault() throws ExtensionInitFailedException
+	public static final void initializeDefault() throws ExtensionInitFailedException
 	{
 		if (singletonInstance == null) {
-			initFromClassName("de.tuberlin.dima.minidb.api.ExtensionFactory");
+			singletonInstance = new LayeredExtensionFactory();
 		}
 	}
-	
 	
 	// ------------------------------------------------------------------------
 	//                           Factory Methods
@@ -145,20 +101,14 @@ public abstract class AbstractExtensionFactory
 	 * @param sqlStatement The statement to be parsed by the parser.
 	 * @return An SQLParser implementation.
 	 */
-	public final SQLParser getParser(String sqlStatement)
-	{
-		return new SQLParserImpl(sqlStatement);
-	}
+	abstract public SQLParser getParser(String sqlStatement);
 	
 	/**
 	 * Instantiates the select-query analyzer.
 	 * 
 	 * @return An instance of a select-query analyzer.
 	 */
-	public final SelectQueryAnalyzer createSelectQueryAnalyzer()
-	{
-		return new SelectQueryAnalyzerImpl();
-	}
+	abstract public SelectQueryAnalyzer createSelectQueryAnalyzer();
 	
 	/**
 	 * Creates a TablePage that gives access to the tuples stored in binary format
@@ -172,7 +122,7 @@ public abstract class AbstractExtensionFactory
 	 * @throws PageFormatException If the byte array did not contain a valid page as
 	 *                             described by the TableSchema.
 	 */
-	public abstract TablePage createTablePage(TableSchema schema, byte[] binaryPage)
+	abstract public TablePage createTablePage(TableSchema schema, byte[] binaryPage)
 	throws PageFormatException;
 	
 	/**
@@ -187,7 +137,7 @@ public abstract class AbstractExtensionFactory
 	 * @throws PageFormatException If the array size does not match the page size
 	 *                             for this table schema.
 	 */
-	public abstract TablePage initTablePage(TableSchema schema, byte[] binaryPage, int newPageNumber)
+	abstract public TablePage initTablePage(TableSchema schema, byte[] binaryPage, int newPageNumber)
 	throws PageFormatException;
 	
 	/**
@@ -202,7 +152,7 @@ public abstract class AbstractExtensionFactory
 	 * @param numPages The number of pages that the cache holds.
 	 * @return The new page cache.
 	 */
-	public abstract PageCache createPageCache(PageSize pageSize, int numPages);
+	abstract public PageCache createPageCache(PageSize pageSize, int numPages);
 	
 	/**
 	 * Creates a buffer pool manager that serves as the resource gateway for all queries.
@@ -223,7 +173,7 @@ public abstract class AbstractExtensionFactory
 	 * @param logger The logger that can be used for 
 	 * @return An instance of the buffer pool manager, with not yet running I/O threads.
 	 */
-	public abstract BufferPoolManager createBufferPoolManager(Config config, Logger logger);
+	abstract public BufferPoolManager createBufferPoolManager(Config config, Logger logger);
 	
 	/**
 	 * Creates a B-Tree Index that allows to evaluate index requests. The index that is evaluated
@@ -234,7 +184,7 @@ public abstract class AbstractExtensionFactory
 	 * @param resourceId The id of the index, which allows to identify the resource.
 	 * @return A B-Tree index for the schema using the given buffer pool manager.
 	 */
-	public abstract BTreeIndex createBTreeIndex(IndexSchema schema, BufferPoolManager bufferPool, int resourceId);
+	abstract public BTreeIndex createBTreeIndex(IndexSchema schema, BufferPoolManager bufferPool, int resourceId);
 	
 	/**
 	 * Creates a new physical query plan operator performing a table scan.
@@ -268,7 +218,7 @@ public abstract class AbstractExtensionFactory
 	 *                             that the operator currently works on.
 	 * @return A new physical plan operator representing a TableScan.
 	 */
-	public abstract TableScanOperator createTableScanOperator(
+	abstract public TableScanOperator createTableScanOperator(
 			BufferPoolManager bufferPool,
 			TableResourceManager tableManager,
 			int resourceId,
@@ -292,7 +242,7 @@ public abstract class AbstractExtensionFactory
 	 * @param stopKeyIncluded A flag indicating whether the upper boundary is inclusive. True indicates an inclusive boundary.
 	 * @return A new physical plan operator representing an IndexScan.
 	 */
-	public abstract IndexScanOperator createIndexScanOperator(
+	abstract public IndexScanOperator createIndexScanOperator(
 			BTreeIndex index,
 			DataField startKey, 
 			DataField stopKey, 
@@ -323,7 +273,7 @@ public abstract class AbstractExtensionFactory
 	 * @param child The child operator generating the tuples to be inserted.
 	 * @return A new physical plan operator representing an InsertOperator.
 	 */
-	public abstract InsertOperator createInsertOperator(
+	abstract public InsertOperator createInsertOperator(
 			BufferPoolManager bufferPool,
 			TableResourceManager tableManager,
 			int resourceId,
@@ -345,7 +295,7 @@ public abstract class AbstractExtensionFactory
 	 * @param child The child operator generating the tuples to be deleted.
 	 * @return A new physical plan operator representing a DeleteOperator.
 	 */
-	public abstract DeleteOperator createDeleteOperator(
+	abstract public DeleteOperator createDeleteOperator(
 			BufferPoolManager bufferPool,
 			int resourceId,
 			PhysicalPlanOperator child
@@ -391,10 +341,10 @@ public abstract class AbstractExtensionFactory
 	 *                            to the output tuple. See also above column.
 	 * @return An implementation of the NestedLoopJoinOperator.
 	 */
-	public abstract NestedLoopJoinOperator createNestedLoopJoinOperator(
+	abstract public NestedLoopJoinOperator createNestedLoopJoinOperator(
 			PhysicalPlanOperator outerChild, PhysicalPlanOperator innerChild,
-			JoinPredicate joinPredicate,
-			int[] columnMapOuterTuple, int[] columnMapInnerTuple);
+            JoinPredicate joinPredicate,
+            int[] columnMapOuterTuple, int[] columnMapInnerTuple);
 
 	/**
 	 * Creates an index lookup operator that returns the RIDs for the key
@@ -405,8 +355,7 @@ public abstract class AbstractExtensionFactory
 	 * @param equalityLiteral The key that the index returns the RIDs for.
 	 * @return An implementation of the IndexScanOperator.
 	 */
-	public abstract IndexLookupOperator getIndexLookupOperator(BTreeIndex index, DataField equalityLiteral);
-
+	abstract public IndexLookupOperator getIndexLookupOperator(BTreeIndex index, DataField equalityLiteral);
 
 	/**
 	 * Creates an index lookup operator returning the RIDs for the tuples in the given range.
@@ -422,7 +371,7 @@ public abstract class AbstractExtensionFactory
 	 * @param upperIncluded Flag indicating whether the upper bound itself is included in the range.
 	 * @return An implementation of the IndexScanOperator.
 	 */
-	public abstract IndexLookupOperator getIndexScanOperatorForBetweenPredicate(BTreeIndex index,
+	abstract public IndexLookupOperator getIndexScanOperatorForBetweenPredicate(BTreeIndex index,
 	                                                                  DataField lowerBound, boolean lowerIncluded,
                                                                       DataField upperBound, boolean upperIncluded);
 
@@ -434,7 +383,7 @@ public abstract class AbstractExtensionFactory
 	 * @param correlatedColumnIndex The index of the column in the correlated tuple that we evaluate against.
 	 * @return An implementation of the IndexCorrelatedScanOperator.
 	 */
-	public abstract IndexCorrelatedLookupOperator getIndexCorrelatedScanOperator(BTreeIndex index, int correlatedColumnIndex);
+	abstract public IndexCorrelatedLookupOperator getIndexCorrelatedScanOperator(BTreeIndex index, int correlatedColumnIndex);
 
 	/**
 	 * Creates a new FETCH operator that takes RIDs to get tuples from a table.
@@ -454,7 +403,7 @@ public abstract class AbstractExtensionFactory
 	 *                        FETCH operator are produced from the tuple fetched from the table.
 	 * @return An implementation of the FetchOperator.
 	 */
-	public abstract FetchOperator createFetchOperator(PhysicalPlanOperator child,
+	abstract public FetchOperator createFetchOperator(PhysicalPlanOperator child,
 			BufferPoolManager bufferPool, int tableResourceId, int[] outputColumnMap);
 	
 	/**
@@ -466,7 +415,7 @@ public abstract class AbstractExtensionFactory
 	 * @param predicate The predicate to be evaluated on the incoming tuples.
 	 * @return An implementation of the FilterOperator.
 	 */
-	public abstract FilterOperator createFilterOperator(PhysicalPlanOperator child,
+	abstract public FilterOperator createFilterOperator(PhysicalPlanOperator child,
 	                                                  LocalPredicate predicate);
 
 	
@@ -482,9 +431,9 @@ public abstract class AbstractExtensionFactory
 	 *                            the right hand argument.
 	 * @return An implementation of the FilterOperator.
 	 */
-	public abstract FilterCorrelatedOperator createCorrelatedFilterOperator(PhysicalPlanOperator child,
+	abstract public FilterCorrelatedOperator createCorrelatedFilterOperator(PhysicalPlanOperator child,
                                                                    JoinPredicate correlatedPredicate);
-
+	
 	/**
 	 * Creates a new sort operator that performs an external merge-sort.
 	 * 
@@ -505,10 +454,10 @@ public abstract class AbstractExtensionFactory
 	 *                         to be sorted in descending order.  
 	 * @return An implementation of the SortOperator.
 	 */
-	public abstract SortOperator createSortOperator(PhysicalPlanOperator child,
+	abstract public SortOperator createSortOperator(PhysicalPlanOperator child,
 			QueryHeap queryHeap, DataType[] columnTypes, int estimatedCardinality,
 			int[] sortColumns, boolean[] columnsAscending);
-
+	
 	/**
 	 * Creates a group by operator that groups and aggregates a sorted stream of tuples.
 	 * 
@@ -555,7 +504,7 @@ public abstract class AbstractExtensionFactory
 	 *                                   the aggregate columns will be put.
 	 * @return An implementation of the GroupByOperator.
 	 */
-	public abstract GroupByOperator createGroupByOperator(PhysicalPlanOperator child,
+	abstract public GroupByOperator createGroupByOperator(PhysicalPlanOperator child,
 			int[] groupColumnIndices, int[] aggColumnIndices,
 			OutputColumn.AggregationType[] aggregateFunctions,
 			DataType[] aggColumnTypes,
@@ -598,25 +547,24 @@ public abstract class AbstractExtensionFactory
 	 *                            to the output tuple. See also above column.
 	 * @return An implementation of the MergeJoinOperator.
 	 */
-	public abstract MergeJoinOperator createMergeJoinOperator(PhysicalPlanOperator leftChild, 
+	abstract public MergeJoinOperator createMergeJoinOperator(PhysicalPlanOperator leftChild, 
 			PhysicalPlanOperator rightChild, int[] leftJoinColumns, 
 			int[] rightJoinColumns, int[] columnMapLeftTuple, int[] columnMapRightTuple);
-
+	
 	/**
 	 * Creates an optimizer for the order of joins.
 	 * 
 	 * @param estimator The cardinality estimator to be used to cost the plans.
 	 * @return The optimizer picking the optimal order of joins.
 	 */
-	public abstract JoinOrderOptimizer createJoinOrderOptimizer(CardinalityEstimator estimator);
-
+	abstract public JoinOrderOptimizer createJoinOrderOptimizer(CardinalityEstimator estimator);
+	
 	/**
 	 * Crates a cardinality estimator for logical operators.
 	 * 
 	 * @return CardinalityEstimator
 	 */
-	public abstract CardinalityEstimator createCardinalityEstimator();
-
+	abstract public CardinalityEstimator createCardinalityEstimator();
 	
 	/**
 	 * Creates a physical operator cost estimator.
@@ -633,7 +581,7 @@ public abstract class AbstractExtensionFactory
 	 *                            correspond to seek time + rotational latency.
 	 * @return The generator responsible for physical plan generation.
 	 */
-	public abstract CostEstimator createCostEstimator(long readCost, long writeCost, long randomReadOverhead, long randomWriteOverhead);
+	abstract public CostEstimator createCostEstimator(long readCost, long writeCost, long randomReadOverhead, long randomWriteOverhead);
 
 	/**
 	 * Creates a physical plan generator.
@@ -642,5 +590,5 @@ public abstract class AbstractExtensionFactory
 	 * @param cardEstimator The cardinality estimator (for logical operators).
 	 * @param costEstimator The cost estimator (for physical operators).
 	 */
-	public abstract PhysicalPlanGenerator createPhysicalPlanGenerator(Catalogue catalogue, CardinalityEstimator cardEstimator, CostEstimator costEstimator);
+	abstract public PhysicalPlanGenerator createPhysicalPlanGenerator(Catalogue catalogue, CardinalityEstimator cardEstimator, CostEstimator costEstimator);
 }

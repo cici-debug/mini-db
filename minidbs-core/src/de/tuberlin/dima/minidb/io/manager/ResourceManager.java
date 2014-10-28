@@ -1,9 +1,11 @@
-package de.tuberlin.dima.minidb.io;
+package de.tuberlin.dima.minidb.io.manager;
 
 
 import java.io.IOException;
 
 import de.tuberlin.dima.minidb.io.cache.CacheableData;
+import de.tuberlin.dima.minidb.io.cache.PageFormatException;
+import de.tuberlin.dima.minidb.io.cache.PageSize;
 
 
 /**
@@ -47,24 +49,51 @@ public abstract class ResourceManager
 	 * @param pageNumber The number of the page to load.
 	 * @return The page object wrapping the page data in the byte buffer. The actual type of
 	 *         that wrapping page depends on the type of the resource.
-	 * @throws PageIOException Thrown, if the page could not be written due to an I/O error.
+	 * @throws PageIOException Thrown, if the page could not be read due to an I/O error.
 	 */
 	public abstract CacheableData readPageFromResource(byte[] buffer, int pageNumber)
 	throws IOException;
 	
 	/**
+	 * Reads a sequence of pages starting with the one with the given number into the given buffers.
+	 * 
+	 * This method directly initiates an I/O operation and should only be called by the I/O threads.
+	 * 
+	 * @param buffers The byte buffers to read the page into. Must be at least as large as the page size.
+	 * @param pageNumber The number of the first page to load.
+	 * @return The page object wrapping the page data in the byte buffer. The actual type of
+	 *         that wrapping page depends on the type of the resource.
+	 * @throws PageIOException Thrown, if some page could not be read due to an I/O error.
+	 */
+	public abstract CacheableData[] readPagesFromResource(byte[][] buffers, int firstPageNumber)
+	throws IOException;
+	
+	/**
 	 * Write the page data in the given byte buffer to the resource's page with the given
 	 * number. The wrapping page object is used to determine additional properties, such
-	 * as that the page is empty.
+	 * as whether the page is empty.
 	 * 
 	 * This method directly initiates an I/O operation and should only be called by the I/O threads.
 	 * 
 	 * @param buffer The byte buffer containing the binary page data. Must be at least as large as the page size.
-	 * @param pageNumber The number of the page to write.
 	 * @param wrapper The page object wrapping the page data in the byte buffer.
 	 * @throws PageIOException Thrown, if the page could not be written due to an I/O error.
 	 */
 	public abstract void writePageToResource(byte[] buffer, CacheableData wrapper)
+	throws IOException;
+	
+	/**
+	 * Write the page data in the given byte buffers to the resource's with the given
+	 * number. The wrapping page object is used to determine additional properties, such
+	 * as whether the page is empty.
+	 * 
+	 * This method directly initiates an I/O operation and should only be called by the I/O threads.
+	 * 
+	 * @param buffer The bytes buffer containing the binary page data. Must be at least as large as the page size.
+	 * @param wrapper The page objects wrapping the page data in the byte buffers.
+	 * @throws PageIOException Thrown, if the page could not be written due to an I/O error.
+	 */
+	public abstract void writePagesToResource(byte[][] buffers, CacheableData[] wrappers)
 	throws IOException;
 	
 	/**

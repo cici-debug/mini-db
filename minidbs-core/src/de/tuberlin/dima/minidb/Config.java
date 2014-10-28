@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
-import de.tuberlin.dima.minidb.io.PageSize;
+import de.tuberlin.dima.minidb.io.cache.PageSize;
 
 
 /**
@@ -151,7 +151,7 @@ public final class Config
 	 */
 	public String getDataDirectory()
 	{
-		return this.props.getProperty(DATA_DIRECTORY_KEY);
+		return Config.class.getResource(this.props.getProperty(DATA_DIRECTORY_KEY)).getPath();
 	}
 	
 	/**
@@ -161,7 +161,7 @@ public final class Config
 	 */
 	public String getTempspaceDirectory()
 	{
-		return this.props.getProperty(TEMPSPACE_DIRECTORY_KEY);
+		return Config.class.getResource(this.props.getProperty(TEMPSPACE_DIRECTORY_KEY)).getPath();
 	}
 	
 	/**

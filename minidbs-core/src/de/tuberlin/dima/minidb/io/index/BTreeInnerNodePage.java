@@ -6,8 +6,8 @@ import de.tuberlin.dima.minidb.catalogue.IndexSchema;
 import de.tuberlin.dima.minidb.core.DataField;
 import de.tuberlin.dima.minidb.core.DataType;
 import de.tuberlin.dima.minidb.core.IntField;
-import de.tuberlin.dima.minidb.io.PageExpiredException;
-import de.tuberlin.dima.minidb.io.PageFormatException;
+import de.tuberlin.dima.minidb.io.cache.PageExpiredException;
+import de.tuberlin.dima.minidb.io.cache.PageFormatException;
 
 
 /**

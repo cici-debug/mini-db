@@ -4,7 +4,7 @@ package de.tuberlin.dima.minidb.optimizer;
 import java.util.Iterator;
 import java.util.Set;
 
-import de.tuberlin.dima.minidb.io.BufferPoolManager;
+import de.tuberlin.dima.minidb.io.manager.BufferPoolManager;
 import de.tuberlin.dima.minidb.qexec.PhysicalPlanOperator;
 import de.tuberlin.dima.minidb.qexec.heap.QueryHeap;
 import de.tuberlin.dima.minidb.semantics.Column;

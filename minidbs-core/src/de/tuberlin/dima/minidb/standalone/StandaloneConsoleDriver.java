@@ -122,11 +122,11 @@ public class StandaloneConsoleDriver
 					catalogueFileName = args[i];
 					continue;
 				}
-				else if (arg.equalsIgnoreCase("-extension")) {
-					i++;
-					extensionFactoryClass = args[i];
-					continue;
-				}
+//				else if (arg.equalsIgnoreCase("-extension")) {
+//					i++;
+//					extensionFactoryClass = args[i];
+//					continue;
+//				}
 				else if (arg.equalsIgnoreCase("-log")) {
 					i++;
 					try {
@@ -157,12 +157,13 @@ public class StandaloneConsoleDriver
 		
 		// initialize the extension factory.
 		try {
-			if (extensionFactoryClass == null) {
-				AbstractExtensionFactory.initializeDefault();
-			}
-			else {
-				AbstractExtensionFactory.initFromClassName(extensionFactoryClass);
-			}
+			AbstractExtensionFactory.initializeDefault();
+//			if (extensionFactoryClass == null) {
+//				AbstractExtensionFactory.initializeDefault();
+//			}
+//			else {
+//				AbstractExtensionFactory.initFromClassName(extensionFactoryClass);
+//			}
 		}
 		catch (ExtensionInitFailedException eifex) {
 			logger.log(Level.SEVERE, "The extension factory could not be initialized: " +

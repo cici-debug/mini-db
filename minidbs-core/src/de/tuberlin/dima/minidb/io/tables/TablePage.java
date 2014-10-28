@@ -2,9 +2,9 @@ package de.tuberlin.dima.minidb.io.tables;
 
 
 import de.tuberlin.dima.minidb.core.DataTuple;
-import de.tuberlin.dima.minidb.io.PageExpiredException;
-import de.tuberlin.dima.minidb.io.PageFormatException;
 import de.tuberlin.dima.minidb.io.cache.CacheableData;
+import de.tuberlin.dima.minidb.io.cache.PageExpiredException;
+import de.tuberlin.dima.minidb.io.cache.PageFormatException;
 import de.tuberlin.dima.minidb.qexec.LowLevelPredicate;
 
 

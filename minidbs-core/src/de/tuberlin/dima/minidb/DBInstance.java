@@ -15,9 +15,9 @@ import de.tuberlin.dima.minidb.catalogue.CatalogueFormatException;
 import de.tuberlin.dima.minidb.catalogue.IndexDescriptor;
 import de.tuberlin.dima.minidb.catalogue.TableDescriptor;
 import de.tuberlin.dima.minidb.core.InternalOperationFailure;
-import de.tuberlin.dima.minidb.io.BufferPoolManager;
-import de.tuberlin.dima.minidb.io.ResourceManager;
 import de.tuberlin.dima.minidb.io.index.IndexResourceManager;
+import de.tuberlin.dima.minidb.io.manager.BufferPoolManager;
+import de.tuberlin.dima.minidb.io.manager.ResourceManager;
 import de.tuberlin.dima.minidb.io.tables.TableResourceManager;
 import de.tuberlin.dima.minidb.qexec.heap.QueryHeap;
 

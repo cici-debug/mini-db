@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.tuberlin.dima.minidb.Constants;
-import de.tuberlin.dima.minidb.io.BufferPoolManager;
+import de.tuberlin.dima.minidb.io.manager.BufferPoolManager;
 import de.tuberlin.dima.minidb.optimizer.OptimizerPlanOperator;
 import de.tuberlin.dima.minidb.optimizer.OrderedColumn;
 import de.tuberlin.dima.minidb.qexec.PhysicalPlanOperator;

@@ -2,7 +2,7 @@ package de.tuberlin.dima.minidb.optimizer;
 
 
 import de.tuberlin.dima.minidb.Constants;
-import de.tuberlin.dima.minidb.io.BufferPoolManager;
+import de.tuberlin.dima.minidb.io.manager.BufferPoolManager;
 import de.tuberlin.dima.minidb.semantics.BaseTableAccess;
 import de.tuberlin.dima.minidb.semantics.Column;
 import de.tuberlin.dima.minidb.semantics.predicate.LocalPredicate;
